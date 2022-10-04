@@ -5,6 +5,7 @@ import requests
 import openpyxl
 import mysql.connector
 import datetime
+import  os
 
 
 mydb = mysql.connector.connect(
@@ -89,11 +90,22 @@ for cell in work_sheet['Sheet1']:
 
 main_list = []
 
-
+cwd = os.getcwd()
 class investor(scrapy.Spider):
     name = 'investor'
     custom_settings = {
-        'CONCURRENT_REQUESTS' : 1
+        'AUTOTHROTTLE_ENABLED': False,
+        'ROBOTSTXT_OBEY': False,
+        'CONCURRENT_REQUESTS': 2,
+        'DOWNLOAD_TIMEOUT': 10,
+        'RETRY_TIMES': 30,
+        'RETRY_HTTP_CODES': [302, 503, 400, 403],
+        # 'Handle_httpstatus_list': [400, 403],
+        'ROTATING_PROXY_LIST_PATH': f'{cwd}/proxy.txt',
+        'DOWNLOADER_MIDDLEWARES': {
+            'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+            'rotating_proxies.middlewares.BanDetectionMiddleware': 620
+        },
     }
 
     def start_requests(self):

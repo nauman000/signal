@@ -879,6 +879,15 @@ class investor(scrapy.Spider):
                     for new_loop_past_investments in item['Past Investment Records']:
                         past_investment_existed = True
                         for old_past_investments in get_past_investment_data_db:
+                            try:
+                                just_ckeck = new_loop_past_investments['coinvestor_names']
+                            except:
+                                new_loop_past_investments['coinvestor_names'] = ''
+                            try:
+                                just_ckeck = new_loop_past_investments['total_raised']
+                            except:
+                                new_loop_past_investments['total_raised'] = ''
+
                             if (new_loop_past_investments['company'] == old_past_investments['company']) and (new_loop_past_investments['total_raised'] == old_past_investments['total_raised']) and (new_loop_past_investments['coinvestor_names'] == old_past_investments['co_investors']):
                                 past_investment_existed = False
                                 inner_loop_update_funding = old_past_investments['funding_id']
@@ -892,6 +901,16 @@ class investor(scrapy.Spider):
                                 for new_loop_funding_round in new_loop_past_investments['funding_rounds']:
                                     funding_round_data_existed= True
                                     for old_funding_round in get_funding_round_data_db_update:
+                                        try:
+                                            check_just = new_loop_funding_round['date']
+                                        except:
+                                            new_loop_funding_round['date'] = old_funding_round['date']
+                                        try:
+                                            check_just = new_loop_funding_round['amount']
+                                        except:
+                                            new_loop_funding_round['amount'] = old_funding_round['amount']
+
+
                                         if (new_loop_funding_round['stage'] == old_funding_round['stage']) and (new_loop_funding_round['date']  == old_funding_round['date']) and (new_loop_funding_round['amount'] == old_funding_round['amount']):
                                             funding_round_data_existed = False
                                             break
@@ -902,6 +921,22 @@ class investor(scrapy.Spider):
                                         mydb.commit()
                                 break
                         if past_investment_existed:
+
+                            try:
+                                temp = new_loop_past_investments['total_raised']
+                            except:
+                                new_loop_past_investments['total_raised'] = old_past_investments['total_raised']
+
+                            try:
+                                temp = new_loop_past_investments['coinvestor_names']
+                            except:
+                                new_loop_past_investments['coinvestor_names'] = old_past_investments['co_investors']
+
+                            try:
+                                temp = new_loop_past_investments['company']
+                            except:
+                                new_loop_past_investments['company'] = old_past_investments['company']
+
                             sql = "INSERT INTO past_investment_records (profile_id,company,total_raised,co_investors) VALUES (%s,%s,%s,%s)"
                             val = (get_id_profile_for_updation, new_loop_past_investments['company'], new_loop_past_investments['total_raised'], new_loop_past_investments['coinvestor_names'])
 
@@ -947,11 +982,6 @@ class investor(scrapy.Spider):
 
                             except:
                                 pass
-
-
-
-
-
 
 
                 except:
@@ -1020,18 +1050,6 @@ class investor(scrapy.Spider):
 
                 except:
                     pass
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
